@@ -1,0 +1,87 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="z-form">
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="alert alert-light z-alert mb-0">
+        <div class="d-flex align-items-start gap-2">
+          <i class="bi bi-plus-circle fs-5"></i>
+          <div>
+            <div class="fw-bold">Crear póliza</div>
+            <div class="text-muted small">Cliente ID: <span class="fw-semibold">{{ clientId }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <label class="form-label">Tipo</label>
+      <select
+        class="form-select"
+        formControlName="policyType"
+        [class.is-invalid]="form.get('policyType')?.touched && form.get('policyType')?.invalid">
+        <option *ngFor="let t of policyTypes" [value]="t">{{ t }}</option>
+      </select>
+      <div class="invalid-feedback">Selecciona un tipo.</div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <label class="form-label">Monto asegurado</label>
+      <input
+        class="form-control"
+        type="number"
+        step="0.01"
+        min="0"
+        formControlName="insuredAmount"
+        placeholder="0.00"
+        [class.is-invalid]="form.get('insuredAmount')?.touched && form.get('insuredAmount')?.invalid"
+      />
+      <div class="invalid-feedback">Ingresa un monto mayor a 0.</div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <label class="form-label">Inicio</label>
+      <input
+        class="form-control"
+        type="date"
+        formControlName="startDate"
+        [class.is-invalid]="form.get('startDate')?.touched && form.get('startDate')?.invalid"
+      />
+      <div class="invalid-feedback">Selecciona una fecha de inicio.</div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <label class="form-label">Fin</label>
+      <input
+        class="form-control"
+        type="date"
+        formControlName="expirationDate"
+        [class.is-invalid]="
+          (form.get('expirationDate')?.touched && form.get('expirationDate')?.invalid) ||
+          (form.touched && form.hasError('dateRange'))
+        "
+      />
+      <div class="invalid-feedback" *ngIf="form.get('expirationDate')?.touched && form.get('expirationDate')?.invalid">
+        Selecciona una fecha de fin.
+      </div>
+      <div class="invalid-feedback d-block" *ngIf="form.touched && form.hasError('dateRange')">
+        La fecha de fin debe ser mayor o igual a la fecha de inicio.
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div *ngIf="ok" class="alert alert-success py-2 mb-0">
+        <i class="bi bi-check-circle me-2"></i>{{ ok }}
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger py-2 mb-0">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+      </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end gap-2 mt-1">
+      <button type="submit" class="btn btn-zurich" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        Guardar
+      </button>
+    </div>
+  </div>
+</form>

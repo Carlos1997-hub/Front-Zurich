@@ -1,0 +1,61 @@
+<div class="card z-card">
+  <div class="card-header z-card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge badge-z-accent d-inline-flex align-items-center justify-content-center">
+        <i class="bi bi-receipt"></i>
+      </span>
+
+      <div class="d-flex flex-column">
+        <span class="z-title">Mis cotizaciones</span>
+        <small class="text-muted">Revisa cotizaciones vigentes y su detalle</small>
+      </div>
+    </div>
+
+    <button class="btn btn-outline-brand btn-sm" (click)="load()">
+      <i class="bi bi-arrow-clockwise me-1"></i> Recargar
+    </button>
+  </div>
+
+  <div class="card-body z-card-body">
+    <div *ngIf="loading" class="text-muted d-flex align-items-center gap-2">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      Cargando...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading && quotes.length">
+      <table class="table table-hover align-middle z-table">
+        <thead>
+          <tr>
+            <th style="width:80px;">ID</th>
+            <th style="width:160px;">Tipo</th>
+            <th style="width:160px;">Monto</th>
+            <th style="width:110px;">Meses</th>
+            <th style="width:160px;">Prima</th>
+            <th style="width:160px;">Estatus</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let q of quotes">
+            <td class="z-cell-id">{{ q.quoteId }}</td>
+            <td class="z-strong">{{ q.policyType }}</td>
+            <td class="z-strong">{{ q.insuredAmount | number:'1.2-2' }}</td>
+            <td class="z-muted">{{ q.termMonths }}</td>
+            <td class="z-strong">{{ q.monthlyPremium | number:'1.2-2' }}</td>
+            <td>{{ q.quoteStatus }}</td>
+            <td class="z-muted">{{ q.notes || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && !quotes.length" class="text-muted">
+      Aún no tienes cotizaciones.
+    </div>
+  </div>
+</div>

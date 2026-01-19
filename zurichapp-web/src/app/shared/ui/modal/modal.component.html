@@ -1,0 +1,12 @@
+<div *ngIf="open" class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <button type="button" class="btn-x" (click)="close()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

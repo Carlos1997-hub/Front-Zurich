@@ -1,0 +1,49 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-5">
+    <div class="card z-card">
+      <div class="card-header z-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-shield-lock"></i>
+          <span>Acceso</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p class="text-muted mb-4">
+          Inicia sesión para consultar pólizas/cotizaciones o administrar clientes.
+        </p>
+
+        <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-3">
+            <label class="form-label">Usuario o email</label>
+            <input class="form-control" formControlName="usernameOrEmail" placeholder="admin o admin@zurich.com" />
+            <div class="text-danger small mt-1" *ngIf="form.get('usernameOrEmail')?.touched && form.get('usernameOrEmail')?.invalid">
+              Requerido.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input class="form-control" type="password" formControlName="password" placeholder="••••••••" />
+            <div class="text-danger small mt-1" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+              Requerido.
+            </div>
+          </div>
+
+          <button class="btn btn-zurich w-100" type="submit" [disabled]="loading">
+            <span *ngIf="!loading"><i class="bi bi-box-arrow-in-right me-1"></i> Entrar</span>
+            <span *ngIf="loading">Entrando...</span>
+          </button>
+
+          <div class="mt-3 text-muted small">
+            Demo:
+            <span class="badge text-bg-light">admin / Admin123*</span>
+            <span class="badge text-bg-light">cliente1 / Client123*</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

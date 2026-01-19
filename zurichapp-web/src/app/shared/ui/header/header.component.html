@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg z-navbar navbar-dark">
+  <div class="container-fluid px-4 px-xl-5">
+    <a class="navbar-brand z-brand" routerLink="/">
+      <i class="bi bi-shield-check me-2"></i>
+      ZurichApp
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMain">
+      <ng-container *ngIf="user$ | async as user; else loggedOut">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item" *ngIf="user.role === 'Administrador'">
+            <a class="nav-link" routerLink="/admin/clients">
+              <i class="bi bi-people me-1"></i> Clientes
+            </a>
+          </li>
+
+          <li class="nav-item" *ngIf="user.role === 'Cliente'">
+            <a class="nav-link" routerLink="/client/policies">
+              <i class="bi bi-file-earmark-text me-1"></i> Mis pólizas
+            </a>
+          </li>
+
+          <li class="nav-item" *ngIf="user.role === 'Cliente'">
+            <a class="nav-link" routerLink="/client/quotes">
+              <i class="bi bi-receipt me-1"></i> Mis cotizaciones
+            </a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-white-50 small d-none d-md-inline">
+            {{ user.username }} • {{ user.role }}
+          </span>
+
+          <button type="button" class="btn btn-zurich btn-sm" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-1"></i> Salir
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #loggedOut>
+        <div class="ms-auto">
+          <a class="btn btn-outline-zurich btn-sm" routerLink="/login">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+          </a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</nav>

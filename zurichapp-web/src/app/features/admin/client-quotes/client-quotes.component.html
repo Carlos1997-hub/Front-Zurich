@@ -1,0 +1,127 @@
+<div class="card z-card">
+  <div class="card-header z-card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge badge-z-accent d-inline-flex align-items-center justify-content-center">
+        <i class="bi bi-receipt"></i>
+      </span>
+
+      <div class="d-flex flex-column">
+        <span class="z-title">Cotizaciones del Cliente</span>
+        <small class="text-muted">Cliente ID: {{ clientId }}</small>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-zurich btn-sm" (click)="showCreateQuote()">
+        <i class="bi bi-plus-circle me-1"></i> Cotización
+      </button>
+
+      <a class="btn btn-outline-brand btn-sm" routerLink="/admin/clients">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+      </a>
+
+      <button type="button" class="btn btn-outline-brand btn-sm" (click)="load()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Recargar
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body z-card-body">
+    <div *ngIf="loading" class="text-muted d-flex align-items-center gap-2">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Cargando...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mb-3">
+      {{ error }}
+    </div>
+
+    <div class="z-filters mb-3" [formGroup]="filterForm" *ngIf="!loading">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-6">
+          <label class="form-label small text-muted mb-1">Buscar</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="q"
+              placeholder="Buscar por QuoteId, tipo, estatus o notas..."
+            />
+            <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Buscar en</label>
+          <select class="form-select" formControlName="field">
+            <option value="all">Todos</option>
+            <option value="id">QuoteId</option>
+            <option value="type">Tipo</option>
+            <option value="status">Estatus</option>
+            <option value="notes">Notas</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Estatus</label>
+          <select class="form-select" formControlName="status">
+            <option value="all">Todos</option>
+            <option *ngFor="let s of getStatusOptions()" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+
+        <div class="col-12 text-md-end">
+          <div class="small text-muted">
+            Mostrando <strong>{{ viewQuotes.length }}</strong> de <strong>{{ quotes.length }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading && viewQuotes.length">
+      <table class="table table-hover align-middle z-table">
+        <thead>
+          <tr>
+            <th style="width:90px;">QuoteId</th>
+            <th style="width:160px;">Tipo</th>
+            <th style="width:160px;">Monto</th>
+            <th style="width:140px;">Plazo</th>
+            <th style="width:160px;">Prima mensual</th>
+            <th style="width:140px;">Estatus</th>
+            <th style="min-width:260px;">Notas</th>
+            <th style="width:220px;">Creada</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let q of viewQuotes">
+            <td class="z-cell-id">{{ q.quoteId }}</td>
+            <td class="z-strong">{{ q.policyType }}</td>
+            <td class="z-strong">{{ q.insuredAmount }}</td>
+            <td>{{ q.termMonths }} meses</td>
+            <td class="z-strong">{{ q.monthlyPremium }}</td>
+            <td>{{ q.quoteStatus }}</td>
+            <td class="z-muted">{{ q.notes || '—' }}</td>
+            <td>{{ q.createdAt | date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && !viewQuotes.length" class="text-muted">
+      Este cliente no tiene cotizaciones con los filtros actuales.
+    </div>
+  </div>
+</div>
+
+<app-modal [open]="openCreateQuote" title="Crear Cotización" (closed)="closeCreateQuote()">
+  <app-quote-create-form
+    [clientId]="clientId"
+    (saved)="onSavedQuote()">
+  </app-quote-create-form>
+</app-modal>

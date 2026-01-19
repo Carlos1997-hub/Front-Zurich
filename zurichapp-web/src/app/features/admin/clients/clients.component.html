@@ -1,0 +1,196 @@
+<div class="card z-card">
+  <div class="card-header z-card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge badge-z-accent d-inline-flex align-items-center justify-content-center">
+        <i class="bi bi-people"></i>
+      </span>
+
+      <div class="d-flex flex-column">
+        <span class="z-title">Clientes</span>
+        <small class="text-muted">Administración de clientes y acciones rápidas</small>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-zurich btn-sm" (click)="showCreateClient()">
+        <i class="bi bi-person-plus me-1"></i> Nuevo
+      </button>
+      <button class="btn btn-outline-brand btn-sm" (click)="load()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Recargar
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body z-card-body">
+    <div *ngIf="loading" class="text-muted d-flex align-items-center gap-2">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      Cargando...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div class="z-filters mb-3" [formGroup]="filterForm" *ngIf="!loading">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-5">
+          <label class="form-label small text-muted mb-1">Buscar</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="q"
+              placeholder="Escribe nombre, identificación, email o teléfono..."
+            />
+            <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Buscar en</label>
+          <select class="form-select" formControlName="field">
+            <option value="all">Todos</option>
+            <option value="identification">Identificación</option>
+            <option value="name">Nombre</option>
+            <option value="email">Email</option>
+            <option value="phone">Teléfono</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-2 text-md-end">
+          <div class="small text-muted">
+            Mostrando <strong>{{ viewClients.length }}</strong> de <strong>{{ clients.length }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading && viewClients.length">
+      <table class="table table-hover align-middle z-table">
+        <thead>
+          <tr>
+            <th style="width:70px;">ID</th>
+            <th style="width:160px;">Identificación</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th style="width:160px;">Teléfono</th>
+            <th style="width:420px;">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let c of viewClients; trackBy: trackByClientId">
+            <td class="z-cell-id">{{ c.clientId }}</td>
+            <td>{{ c.identificationNumber }}</td>
+            <td class="z-strong">{{ c.fullName }}</td>
+            <td class="z-muted">{{ c.email }}</td>
+            <td>{{ c.phone }}</td>
+
+            <td class="text-nowrap">
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="goPolicies(c.clientId)">
+                <i class="bi bi-file-earmark-text me-1"></i>Pólizas
+              </button>
+
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="goQuotes(c.clientId)">
+                <i class="bi bi-receipt me-1"></i>Cotizaciones
+              </button>
+
+              <button class="btn btn-outline-secondary btn-sm me-1" (click)="showEditClient(c)">
+                <i class="bi bi-pencil me-1"></i>Editar
+              </button>
+
+              <button class="btn btn-outline-danger btn-sm" (click)="openDelete(c)">
+                <i class="bi bi-trash me-1"></i>Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && !viewClients.length" class="text-muted">
+      No hay clientes registrados con los filtros actuales.
+    </div>
+  </div>
+</div>
+
+<app-modal [open]="openCreateClient" title="Crear Cliente + Usuario" (closed)="closeAll()">
+  <app-client-create-form (saved)="onSaved()"></app-client-create-form>
+</app-modal>
+
+<app-modal [open]="openEditClient" title="Editar Cliente" (closed)="closeAll()">
+  <app-client-edit-form
+    *ngIf="selectedClient"
+    [client]="selectedClient"
+    (saved)="onSaved()">
+  </app-client-edit-form>
+</app-modal>
+
+<app-modal [open]="openCreatePolicy" title="Crear Póliza" (closed)="closeAll()">
+  <div class="mb-3" *ngIf="selectedClient">
+    <span class="text-muted">Cliente:</span>
+    <strong>{{ selectedClient.fullName }}</strong>
+    <span class="text-muted"> (ID: {{ selectedClient.clientId }})</span>
+  </div>
+
+  <app-policy-create-form
+    *ngIf="selectedClientId"
+    [clientId]="selectedClientId"
+    (saved)="onSaved()">
+  </app-policy-create-form>
+</app-modal>
+
+<app-modal [open]="openCreateQuote" title="Crear Cotización" (closed)="closeAll()">
+  <div class="mb-3" *ngIf="selectedClient">
+    <span class="text-muted">Cliente:</span>
+    <strong>{{ selectedClient.fullName }}</strong>
+    <span class="text-muted"> (ID: {{ selectedClient.clientId }})</span>
+  </div>
+
+  <app-quote-create-form
+    *ngIf="selectedClientId"
+    [clientId]="selectedClientId"
+    (saved)="onSaved()">
+  </app-quote-create-form>
+</app-modal>
+
+<app-modal [open]="openDeleteClient" title="Eliminar cliente" (closed)="closeDelete()">
+  <div class="z-form">
+    <div class="alert alert-danger z-alert mb-3">
+      <div class="d-flex align-items-start gap-2">
+        <i class="bi bi-exclamation-triangle fs-5"></i>
+        <div>
+          <div class="fw-bold">¿Eliminar (dar de baja) este cliente?</div>
+          <div class="small">
+            <span class="text-muted">Cliente:</span>
+            <span class="fw-semibold">{{ deleteTarget?.fullName }}</span>
+            <span class="text-muted"> (ID: {{ deleteTarget?.clientId }})</span>
+          </div>
+          <div class="text-muted small mt-1">
+            Se desactivará y ya no debería aparecer en listados.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="deleteError" class="alert alert-danger py-2">
+      <i class="bi bi-x-circle me-2"></i>{{ deleteError }}
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-outline-brand" (click)="closeDelete()" [disabled]="deleting">
+        Cancelar
+      </button>
+
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+        <span *ngIf="deleting" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        Eliminar
+      </button>
+    </div>
+  </div>
+</app-modal>
